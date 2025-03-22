@@ -37,7 +37,23 @@ class Tuple:
             return Vector(-self.x, -self.y, -self.z)
         else:
             return Tuple(-self.x, -self.y, -self.z, -self.w)
+        
+    def multiply(self, scalar):
+        return Tuple(self.x * scalar, self.y * scalar, self.z * scalar, self.w * scalar)
+    
+    def divide(self, scalar):
+        return Tuple(self.x / scalar, self.y / scalar, self.z / scalar, self.w / scalar)
+    
+    def magnitude(self):
+        return (self.x**2 + self.y**2 + self.z**2 + self.w**2)**0.5
 
+    def normalize(self):
+        mag = self.magnitude()
+        return Tuple(self.x / mag, self.y / mag, self.z / mag, self.w / mag)
+
+    def dot(self, other):
+        return self.x * other.x + self.y * other.y + self.z * other.z + self.w * other.w
+    
     def is_point(self):
         return self.w == 1.0
     
