@@ -4,7 +4,7 @@ import pytest
 
 # Add the src directory to the sys.path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../src')))
-from core.tuples import Point, Vector, Tuple
+from core.tuples import Point, Vector, Tuple, Projectile, Environment
 
 @pytest.fixture
 def setup():
@@ -92,6 +92,19 @@ def test_tuple_dot(setup):
     p2 = Vector(2, 3, 4)
     # Test 1: Dot product of two vectors
     assert p1.dot(p2) == 20
+
+def test_tuple_cross(setup):
+    p1 = Vector(1, 2, 3)
+    p2 = Vector(2, 3, 4)
+    # Test 1: Cross product of two vertices
+    assert p1.cross(p2) == Vector(-1, 2, -1)
+    assert p2.cross(p1) == Vector(1, -2, 1)
+
+def test_tuple_tick(setup):
+    projectile = Projectile(Point(0,1,0), Vector(1,1,0).normalize())
+    environment = Environment(Vector(0,-0.1,0), Vector(-0.01,0,0))
+    tick = Tuple.tick(environment, projectile)
+    print(tick.position)
 
 if __name__=="__main__":
     pytest.main()

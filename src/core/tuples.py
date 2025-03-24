@@ -54,6 +54,14 @@ class Tuple:
     def dot(self, other):
         return self.x * other.x + self.y * other.y + self.z * other.z + self.w * other.w
     
+    def cross(self, other):
+        return Vector(self.y*other.z - self.z*other.y, self.z*other.x - self.x*other.z, self.x*other.y - self.y*other.x)
+    
+    def tick(env, proj):
+        position = proj.position.add(proj.velocity)
+        velocity = proj.velocity.add(env.gravity).add(env.wind)
+        return Projectile(position, velocity)
+    
     def is_point(self):
         return self.w == 1.0
     
@@ -72,3 +80,13 @@ class Point(Tuple):
 class Vector(Tuple):
     def __init__(self, x, y, z):
         super().__init__(x, y, z, 0.0)
+
+class Projectile():
+    def __init__(self, position, velocity):
+        self.position = position
+        self.velocity = velocity
+
+class Environment():
+    def __init__(self, gravity, wind):
+        self.gravity = gravity
+        self.wind = wind
