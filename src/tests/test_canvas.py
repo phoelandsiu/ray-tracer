@@ -44,9 +44,35 @@ def test_canvas_to_ppm(setup_canvas):
 
     expected_body = "255 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
     expected_body += "0 0 0 0 0 0 0 128 0 0 0 0 0 0 0\n"
-    expected_body += "0 0 0 0 0 0 0 0 0 0 0 0 0 0 1\n"
-    # expected_body += "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n" * (20 - 3)
+    expected_body += "0 0 0 0 0 0 0 0 0 0 0 0 0 0 255\n"
 
-    print("PPM Output:")
-    print(ppm_output)
     assert ppm_output[len(expected_header):].startswith(expected_body)
+
+def test_split_long_lines():
+    """Tests the splitting of long lines (>70 characters) in PPM output."""
+    canvas = Canvas(10, 2)
+    for x in range(canvas.width):
+        for y in range(canvas.height):
+            canvas.write_pixel(x, y, (1, 0.8, 0.6))
+
+    ppm_output = canvas.canvas_to_ppm()
+
+    expected_header = f"P3\n{canvas.width} {canvas.height}\n255\n"
+    assert ppm_output.startswith(expected_header)
+
+    body = ppm_output[len(expected_header):]
+    expected_body = "255 204 153 255 204 153 255 204 153 255 204 153 255 204 153 255 204\n"
+    expected_body += "153 255 204 153 255 204 153 255 204 153 255 204 153\n"
+    expected_body += "255 204 153 255 204 153 255 204 153 255 204 153 255 204 153 255 204\n"
+    expected_body += "153 255 204 153 255 204 153 255 204 153 255 204 153\n"
+    assert body.startswith(expected_body)
+
+def test_ppm_ends_with_newline():
+    """Test that the PPM output ends with a newline."""
+    canvas = Canvas(5,3)
+    canvas.write_pixel(0, 0, (1.5, 0, 0))
+    canvas.write_pixel(2, 1, (0, 0.5, 0))
+    canvas.write_pixel(4, 2, (-0.5, 0, 1))
+
+    ppm_output = canvas.canvas_to_ppm()
+    assert ppm_output.endswith("\n")
