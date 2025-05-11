@@ -129,20 +129,6 @@ class Tuple:
         """
         return Vector(self.y*other.z - self.z*other.y, self.z*other.x - self.x*other.z, self.x*other.y - self.y*other.x)
     
-    def tick(env, proj):
-        """
-        Updates the position and velocity of a projectile after one time step, 
-        given the environmental forces of gravity and wind.
-        Args:
-            env: An object with gravity and wind vectors.
-            proj: A Projectile object with position and velocity vectors.
-        Returns:
-            A new Projectile with updated position and velocity.
-        """
-        position = proj.position.add(proj.velocity)
-        velocity = proj.velocity.add(env.gravity).add(env.wind)
-        return Projectile(position, velocity)
-    
     def is_point(self):
         """
         Returns True if the Tuple is a point (w = 1.0), False otherwise.
@@ -192,6 +178,20 @@ class Projectile():
         self.position = position
         self.velocity = velocity
 
+    def tick(self, env, proj):
+        """
+        Updates the position and velocity of a projectile after one time step, 
+        given the environmental forces of gravity and wind.
+        Args:
+            env: An object with gravity and wind vectors.
+            proj: A Projectile object with position and velocity vectors.
+        Returns:
+            A new Projectile with updated position and velocity.
+        """
+        position = Point(proj.position.x + proj.velocity.x, proj.position.y + proj.velocity.y, proj.position.z + proj.velocity.z)
+        velocity = Vector(proj.velocity.x + env.wind.x, proj.velocity.y + env.gravity.y, proj.velocity.z + env.gravity.z)
+        return Projectile(position, velocity)
+
 class Environment():
     """
     Represents the environment in which a projectile moves.
@@ -208,6 +208,7 @@ class Color(Tuple):
     """
     def __init__(self, red, green, blue):
         super().__init__(red, green, blue, 0.0)
+
     def add(self, other):
         """
         Returns a new Color representing the sum of two Colors.
@@ -217,6 +218,7 @@ class Color(Tuple):
             A new Color with the sum of components.
         """
         return Color(self.x + other.x, self.y + other.y, self.z + other.z)
+    
     def subtract(self, other):
         """
         Returns a new Color representing the difference between two Colors.
@@ -226,6 +228,7 @@ class Color(Tuple):
             A new Color with the difference of components.
         """
         return Color(self.x - other.x, self.y - other.y, self.z - other.z)
+    
     def multiply(self, scalar):
         """
         Returns a new Color with each component multiplied by the scalar.
@@ -235,15 +238,18 @@ class Color(Tuple):
             A new Color with each component multiplied by the scalar.
         """
         return Color(self.x * scalar, self.y * scalar, self.z * scalar)
+    
     def multiply_color(self, other):
         """
         Returns a new Color representing the product of two Colors.
+        This is called the Hadamard (or Schur) product.
         Args:
             other: Another Color object to multiply with this Color.
         Returns:
             A new Color with the product of components.
         """
         return Color(self.x * other.x, self.y * other.y, self.z * other.z)
+    
     def __eq__(self, other):
         """
         Compares two Color objects for equality.
