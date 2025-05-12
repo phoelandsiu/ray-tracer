@@ -152,6 +152,46 @@ class Tuple:
         if not isinstance(other, Tuple):
             return False
         return self.x == other.x and self.y == other.y and self.z == other.z and self.w == other.w
+    
+    def __len__(self):
+        """
+        Returns the number of components in the Tuple.
+        """
+        return 4
+    
+    def __getitem__(self, index):
+        """
+        Returns the component at the given index.
+        Args:
+            index: An integer index (0, 1, 2, or 3).
+        Returns:
+            The component at the given index.
+        Raises:
+            IndexError: If the index is out of range.
+        """
+        if index < 0 or index >= 4:
+            raise IndexError("Index out of range")
+        return [self.x, self.y, self.z, self.w][index]
+    
+    def __setitem__(self, index, value):
+        """
+        Sets the component at the given index.
+        Args:
+            index: An integer index (0, 1, 2, or 3).
+            value: The value to set at the given index.
+        Raises:
+            IndexError: If the index is out of range.
+        """
+        if index < 0 or index >= 4:
+            raise IndexError("Index out of range")
+        if index == 0:
+            self.x = value
+        elif index == 1:
+            self.y = value
+        elif index == 2:
+            self.z = value
+        elif index == 3:
+            self.w = value
 
 class Point(Tuple):
     """
