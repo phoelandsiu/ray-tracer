@@ -1,3 +1,5 @@
+import math
+
 class Matrix:
     def __init__(self, rows, cols):
         """Initializes a matrix with the given number of rows and columns."""
@@ -25,13 +27,13 @@ class Matrix:
             for j in range(self.cols):
                 self.data[i][j] = values[i][j]
 
-    def compare(self, other):
+    def compare(self, other, epsilon=1e-5):
         """Compares two matrices for equality."""
         if (self.rows != other.rows or self.cols != other.cols):
             return False
         for i in range(self.rows):
             for j in range(self.cols):
-                if (self.data[i][j] != other.data[i][j]):
+                if not math.isclose(self.data[i][j], other.data[i][j], abs_tol=epsilon):
                     return False
         return True
 
@@ -63,3 +65,55 @@ class Matrix:
         for i in range(size):
             identity_matrix[i][i] = 1
         return identity_matrix
+
+    def transpose(self):
+        """Transposes the matrix."""
+        transposed = Matrix(self.cols, self.rows)
+        for i in range(self.rows):
+            for j in range(self.cols):
+                transposed[j][i] = self[i][j]
+        return transposed
+    
+    def determinant(self):
+        """Calculates the determinant of a matrix."""
+        if self.rows < 2 or self.cols < 2:
+            raise ValueError("Determinant is only defined for 2x2 matrices")
+        if (self.rows == 2 and self.cols == 2):
+            return self[0][0] * self[1][1] - self[0][1] * self[1][0]
+        det = 0
+        for c in range(self.cols):
+            det += self[0][c] * self.cofactor(0, c)
+        return det
+    
+    def submatrix(self, row, col):
+        """Returns the submatrix obtained by removing the specified row and column."""
+        if row < 0 or row > self.rows or col < 0 or col > self.cols:
+            raise ValueError("Row and column indices must be within the matrix dimensions")
+        submatrix = Matrix(self.rows - 1, self.cols - 1)
+        for i in range(self.rows):
+            for j in range(self.cols):
+                if i != row and j != col:
+                    submatrix[i - (i > row)][j - (j > col)] = self[i][j]
+        return submatrix
+    
+    def minor(self, row, col):
+        """Calculates the minor of the matrix at the specified row and column."""
+        return self.submatrix(row, col).determinant()
+    
+    def cofactor(self, row, col):
+        """Calculates the cofactor of the matrix at the specified row and column."""
+        return (-1) ** (row + col) * self.minor(row, col)
+    
+    def inverse(self):
+        """Calculates the inverse of the matrix."""
+        if self.rows != self.cols:
+            raise ValueError("Inverse is only defined for square matrices")
+        det = self.determinant()
+        if det == 0:
+            raise ValueError("Matrix is not invertible")
+        inverse_matrix = Matrix(self.rows, self.cols)
+        for i in range(self.rows):
+            for j in range(self.cols):
+                # Calculate the cofactor, transpose it, and divide by the determinant
+                inverse_matrix[j][i] = self.cofactor(i, j) / det
+        return inverse_matrix
