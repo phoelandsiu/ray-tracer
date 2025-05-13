@@ -1,3 +1,5 @@
+import math
+
 class Tuple:
     def __init__(self, x, y, z, w):
         """
@@ -151,8 +153,12 @@ class Tuple:
         """ 
         if not isinstance(other, Tuple):
             return False
-        return self.x == other.x and self.y == other.y and self.z == other.z and self.w == other.w
-    
+        return (
+            math.isclose(self.x, other.x, abs_tol=1e-5) and
+            math.isclose(self.y, other.y, abs_tol=1e-5) and
+            math.isclose(self.z, other.z, abs_tol=1e-5) and
+            math.isclose(self.w, other.w, abs_tol=1e-5)
+        )
     def __len__(self):
         """
         Returns the number of components in the Tuple.
@@ -192,6 +198,25 @@ class Tuple:
             self.z = value
         elif index == 3:
             self.w = value
+    
+    def __repr__(self):
+        """Returns a string representation of the Tuple."""
+        return f"Tuple({self.x}, {self.y}, {self.z}, {self.w})"
+
+    def compare(self, other, epsilon=1e-5):
+        """
+        Compares two Tuple objects for equality within a tolerance.
+        Args:
+            other: Another Tuple object to compare with.
+            epsilon: A small value for comparing floating-point numbers.
+        Returns:
+            True if Tuples are equal within tolerance, False otherwise."""
+        if not isinstance(other, Tuple):
+            return False
+        return (abs(self.x - other.x) < epsilon and 
+                abs(self.y - other.y) < epsilon and 
+                abs(self.z - other.z) < epsilon and 
+                abs(self.w - other.w) < epsilon)
 
 class Point(Tuple):
     """
@@ -201,6 +226,10 @@ class Point(Tuple):
     def __init__(self, x, y, z):
         super().__init__(x, y, z, 1.0)
 
+    def __repr__(self):
+        """Returns a string representation of the Point."""
+        return f"Point({self.x}, {self.y}, {self.z})"
+
 class Vector(Tuple):
     """
     Represents a vector in 3D space.
@@ -208,7 +237,10 @@ class Vector(Tuple):
     """
     def __init__(self, x, y, z):
         super().__init__(x, y, z, 0.0)
-
+    def __repr__(self):
+        """Returns a string representation of the Vector."""
+        return f"Vector({self.x}, {self.y}, {self.z})"
+    
 class Projectile():
     """
     Represents a projectile in motion.

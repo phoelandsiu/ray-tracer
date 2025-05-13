@@ -1,4 +1,5 @@
 import math
+from core.tuples import Tuple, Point, Vector
 
 class Matrix:
     def __init__(self, rows, cols):
@@ -117,3 +118,62 @@ class Matrix:
                 # Calculate the cofactor, transpose it, and divide by the determinant
                 inverse_matrix[j][i] = self.cofactor(i, j) / det
         return inverse_matrix
+    
+    @classmethod
+    def translation_matrix(cls, x, y, z):
+        """Create a translation matrix."""
+        translation_matrix = Matrix.identity(4)
+        translation_matrix[0][3] = x
+        translation_matrix[1][3] = y
+        translation_matrix[2][3] = z
+        return translation_matrix
+
+    def __mul__(self, tuple):
+        """Multiplies a matrix by a tuple and returns a tuple.
+        [ 1  0  0  tx ]   [ x ]     [ x + tx ]
+        [ 0  1  0  ty ] × [ y ]  =  [ y + ty ]
+        [ 0  0  1  tz ]   [ z ]     [ z + tz ]
+        [ 0  0  0   1 ]   [ 1 ]     [   1    ]
+        """
+        if (self.cols != len(tuple)):
+            raise ValueError("Number of columns in the matrix must match the length of the tuple")
+        x = (self[0][0] * tuple.x + self[0][1] * tuple.y + self[0][2] * tuple.z + self[0][3] * tuple.w)
+        y = (self[1][0] * tuple.x + self[1][1] * tuple.y + self[1][2] * tuple.z + self[1][3] * tuple.w)
+        z = (self[2][0] * tuple.x + self[2][1] * tuple.y + self[2][2] * tuple.z + self[2][3] * tuple.w)
+        w = (self[3][0] * tuple.x + self[3][1] * tuple.y + self[3][2] * tuple.z + self[3][3] * tuple.w)
+
+        if (math.isclose(w, 0.0)):
+            return Vector(x, y, z)
+        elif math.isclose(w, 1.0):
+            return Point(x, y, z)
+        else:
+            return Tuple(x, y, z, w)
+        
+    @classmethod
+    def scaled_matrix(cls, x, y, z):
+        """Creates a scaling matrix."""
+        scaled_matrix = Matrix.identity(4)
+        scaled_matrix[0][0] = x
+        scaled_matrix[1][1] = y
+        scaled_matrix[2][2] = z
+        return scaled_matrix
+
+    def scale(self, tuple):
+        """Scales a tuple using the matrix."""
+        if (self.cols != len(tuple)):
+            raise ValueError("Number of columns in the matrix must match the length of the tuple")
+        x = (self[0][0] * tuple.x + self[0][1] * tuple.y + self[0][2] * tuple.z + self[0][3] * tuple.w)
+        y = (self[1][0] * tuple.x + self[1][1] * tuple.y + self[1][2] * tuple.z + self[1][3] * tuple.w)
+        z = (self[2][0] * tuple.x + self[2][1] * tuple.y + self[2][2] * tuple.z + self[2][3] * tuple.w)
+        w = (self[3][0] * tuple.x + self[3][1] * tuple.y + self[3][2] * tuple.z + self[3][3] * tuple.w)
+
+        if (math.isclose(w, 0.0)):
+            return Vector(x, y, z)
+        elif math.isclose(w, 1.0):
+            return Point(x, y, z)
+        else:
+            return Tuple(x, y, z, w)
+        
+    def __repr__(self):
+        """Returns a string representation of the matrix."""
+        return "\n".join([" ".join([str(self.data[i][j]) for j in range(self.cols)]) for i in range(self.rows)])

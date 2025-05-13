@@ -5,7 +5,7 @@ import pytest
 # Add the src directory to the sys.path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../src')))
 from core.matrices import Matrix
-from core.tuples import Tuple
+from core.tuples import Tuple, Point, Vector
 
 @pytest.fixture
 def setup_matrix():
@@ -308,3 +308,46 @@ def test_inverse_equality():
                     [6, -2, 0, 5]])
     assert m.compare(m.multiply(n).multiply(n.inverse())) == True
     
+def test_point_multiply_translation():
+    """Tests the multiplication of a point by a translation matrix."""
+    m = Matrix.translation_matrix(5, -3, 2)
+    p = Point(-3, 4, 5)
+    p2 = m * p
+    p3 = Point(2, 1, 7)
+    assert p2 == p3
+
+def test_vector_multiply_translation():
+    """Tests that the multiplication of a vector by a translation matrix does not change the vector."""
+    m = Matrix.translation_matrix(5, -3, 2)
+    v = Vector(-3, 4, 5)
+    v2 = m * v
+    assert v2 == v
+
+def test_point_multiply_scaling():
+    """Tests the multiplication of a point by a scaling matrix."""
+    m = Matrix.scaled_matrix(2, 3, 4)
+    p = Point(-4, 6, 8)
+    p2 = m * p
+    p3 = Point(-8, 18, 32)
+    assert p2 == p3
+
+def test_vector_multiply_scaling():
+    """Tests the multiplication of a vector by a scaling matrix."""
+    m = Matrix.scaled_matrix(2, 3, 4)
+    v = Vector(-4, 6, 8)
+    v2 = m * v
+    v3 = Vector(-8, 18, 32)
+    assert v2 == v3
+
+def test_inverse_scaling():
+    """Tests the inverse of a scaling matrix."""
+    m = Matrix.scaled_matrix(2, 3, 4)
+    inv = m.inverse()
+    v = Vector(-4, 6, 8)
+    assert inv * v == Vector(-2, 2, 2)
+
+def test_reflection():
+    """Tests the reflection of a point by scaling by a negative value."""
+    m = Matrix.scaled_matrix(-1, 1, 1)
+    p = Point(2, 3, 4)
+    assert m * p == Point(-2, 3, 4)
