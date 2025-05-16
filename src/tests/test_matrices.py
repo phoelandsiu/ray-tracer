@@ -1,6 +1,7 @@
 import sys
 import os
 import pytest
+import math
 
 # Add the src directory to the sys.path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../src')))
@@ -351,3 +352,94 @@ def test_reflection():
     m = Matrix.scaled_matrix(-1, 1, 1)
     p = Point(2, 3, 4)
     assert m * p == Point(-2, 3, 4)
+
+def test_rotation_x():
+    """Tests the rotation of a point around the x-axis."""
+    p = Point(0, 1, 0)
+    m = Matrix.rotation_matrix_x(math.pi / 4)
+    p2 = m * p
+    p3 = Point(0, math.sqrt(2) / 2, math.sqrt(2) / 2)
+    assert p2 == p3
+
+def test_rotation_y():
+    """Tests the rotation of a point around the y-axis."""
+    p = Point(0, 0, 1)
+    m = Matrix.rotation_matrix_y(math.pi / 4)
+    n = Matrix.rotation_matrix_y(math.pi / 2)
+    p2 = m * p
+    p3 = Point(math.sqrt(2) / 2, 0, math.sqrt(2) / 2)
+    assert p2 == p3
+
+    p2 = n * p
+    p3 = Point(1, 0, 0)
+    assert p2 == p3
+
+def test_rotation_z():
+    """Tests the rotation of a point around the z-axis."""
+    p = Point(0, 1, 0)
+    m = Matrix.rotation_matrix_z(math.pi / 4)
+    n = Matrix.rotation_matrix_z(math.pi / 2)
+    p2 = m * p
+    p3 = Point(-math.sqrt(2) / 2, math.sqrt(2) / 2, 0)
+    assert p2 == p3
+
+    p2 = n * p 
+    p3 = Point(-1, 0, 0)
+    assert p2 == p3
+
+def test_shearing():
+    """"Tests the shearing of a point."""
+    p = Point(2, 3, 4)
+    m = Matrix.shearing_matrix(1, 0, 0, 0, 0, 0)
+    p2 = m * p
+    p3 = Point(5, 3, 4)
+    assert p2 == p3
+
+    m = Matrix.shearing_matrix(0, 1, 0, 0, 0, 0)
+    p2 = m * p
+    p3 = Point(6, 3, 4)
+    assert p2 == p3
+
+    m = Matrix.shearing_matrix(0, 0, 1, 0, 0, 0)
+    p2 = m * p
+    p3 = Point(2, 5, 4)
+    assert p2 == p3
+
+    m = Matrix.shearing_matrix(0, 0, 0, 1, 0, 0)
+    p2 = m * p
+    p3 = Point(2, 7, 4)
+    assert p2 == p3
+
+    m = Matrix.shearing_matrix(0, 0, 0, 0, 1, 0)
+    p2 = m * p
+    p3 = Point(2, 3, 6)
+    assert p2 == p3
+
+    m = Matrix.shearing_matrix(0, 0, 0, 0, 0, 1)
+    p2 = m * p
+    p3 = Point(2, 3, 7)
+    assert p2 == p3
+
+def test_chaining():
+    """Tests the chaining of transformations."""
+    p = Point(1, 0, 1)
+    a = Matrix.rotation_matrix_x(math.pi / 2)
+    b = Matrix.scaled_matrix(5, 5, 5)
+    c = Matrix.translation_matrix(10, 5, 7)
+    
+    p2 = a * p
+    p5 = Point(1, -1, 0)
+    assert p2 == p5
+
+    p3 = b * p2
+    p6 = Point(5, -5, 0)
+    assert p3 == p6
+
+    p4 = c * p3
+    p7 = Point(15, 0, 7)
+    assert p4 == p7
+
+    # Chaining the transformations -- must be applied in reverse order
+    T = c.multiply(b).multiply(a)
+    p8 = T * p
+    assert p4 == p8

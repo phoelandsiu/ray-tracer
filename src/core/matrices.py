@@ -173,7 +173,49 @@ class Matrix:
             return Point(x, y, z)
         else:
             return Tuple(x, y, z, w)
-        
+
+    @classmethod
+    def rotation_matrix_x(self, angle):
+        """Creates a rotation matrix around the x-axis."""
+        rotation_matrix = Matrix.identity(4)
+        rotation_matrix[1][1] = math.cos(angle)
+        rotation_matrix[2][2] = math.cos(angle)
+        rotation_matrix[1][2] = -math.sin(angle)
+        rotation_matrix[2][1] = math.sin(angle)
+        return rotation_matrix
+    
+    @classmethod
+    def rotation_matrix_y(self, angle):
+        """Creates a rotation matrix around the y-axis."""
+        rotation_matrix = Matrix.identity(4)
+        rotation_matrix[0][0] = math.cos(angle)
+        rotation_matrix[2][2] = math.cos(angle)
+        rotation_matrix[0][2] = math.sin(angle)
+        rotation_matrix[2][0] = -math.sin(angle)
+        return rotation_matrix
+
+    @classmethod
+    def rotation_matrix_z(self, angle):
+        """Creates a rotation matrix around the z-axis."""
+        rotation_matrix = Matrix.identity(4)
+        rotation_matrix[0][0] = math.cos(angle)
+        rotation_matrix[1][1] = math.cos(angle)
+        rotation_matrix[0][1] = -math.sin(angle)
+        rotation_matrix[1][0] = math.sin(angle)
+        return rotation_matrix
+
+    @classmethod
+    def shearing_matrix(self, xy=0, xz=0, yx=0, yz=0, zx=0, zy=0):
+        """Creates a shear matrix."""
+        shear_matrix = Matrix.identity(4)
+        shear_matrix[0][1] = xy
+        shear_matrix[0][2] = xz
+        shear_matrix[1][0] = yx
+        shear_matrix[1][2] = yz
+        shear_matrix[2][0] = zx
+        shear_matrix[2][1] = zy
+        return shear_matrix
+         
     def __repr__(self):
         """Returns a string representation of the matrix."""
         return "\n".join([" ".join([str(self.data[i][j]) for j in range(self.cols)]) for i in range(self.rows)])
